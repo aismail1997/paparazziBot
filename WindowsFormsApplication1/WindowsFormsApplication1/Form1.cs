@@ -22,6 +22,7 @@ namespace WindowsFormsApplication1
         private static string deviceType = "Raspberry_Pi3";
         private static string deviceId = "Device02";
         private static string imagestatus;
+        private static int check = 0;
 
         private ApplicationClient applicationClient = new ApplicationClient(orgId, appId, apiKey, authToken);
 
@@ -51,7 +52,7 @@ namespace WindowsFormsApplication1
             } catch(Exception ex) {
                 textBox1.Text = "ex:" + ex.Message;
             }
-            textBox1.Text = "Started Connection";
+            textBox1.Text = "Started Connection...";
             //Console.WriteLine("Started Connection...");
         }
 
@@ -87,8 +88,11 @@ namespace WindowsFormsApplication1
             // take a picture
             string cmdName = "takeapic";
             string data = "P";
-            sendcmd(cmdName, data);
             textBox1.Text = "Taking a pic...";
+            sendcmd(cmdName, data);
+            while (check == 0) {}
+            check = 0;
+            textBox1.Text = imagestatus;
         }
 
         private void button3_Click(object sender, EventArgs e)
@@ -139,7 +143,7 @@ namespace WindowsFormsApplication1
         
         public static void processEvent(string deviceType, string deviceId, string eventName, string format, string data)
         {            
-            //Console.WriteLine(data);
+            Console.WriteLine(data);
             //if (!eventName.Equals("image_buffer"))
             //{
                 JObject myjson = JObject.Parse(data);
@@ -153,25 +157,23 @@ namespace WindowsFormsApplication1
                 if (!faces.HasValues)
                 {
                     imagestatus = "Couldn't find anyone";
-                    Console.WriteLine(imagestatus);
+                    //Console.WriteLine(imagestatus);
 
                 }
                 else {
                     if (faces["identity"] == null)
                     {
                         imagestatus = "Found a " + faces["gender"]["gender"] + " of the age range: " + faces["age"]["max"] + "-" + faces["age"]["min"];
-                        Console.WriteLine(imagestatus);
+                        //Console.WriteLine(imagestatus);
                     }
                     else
                     {
                         imagestatus = "Celebrity Found! " + (string)faces["identity"]["name"];
-                        Console.WriteLine(imagestatus);
+                        //Console.WriteLine(imagestatus);
                     }
                 }
+            check = 1;
                 speech(imagestatus);
-                //textBox1.Text = imagestatus;
-
-            //}
         }
 
         public static void processDeviceStatus(string deviceType, string deviceId, string data)
