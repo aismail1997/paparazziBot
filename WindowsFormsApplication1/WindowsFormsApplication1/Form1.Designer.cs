@@ -147,7 +147,7 @@
             this.button8.Name = "button8";
             this.button8.Size = new System.Drawing.Size(203, 40);
             this.button8.TabIndex = 11;
-            this.button8.Text = "Start Autonomous Mode";
+            this.button8.Text = "Scan for Individual";
             this.button8.UseVisualStyleBackColor = true;
             this.button8.Click += new System.EventHandler(this.button8_Click);
             // 

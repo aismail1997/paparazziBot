@@ -10,6 +10,7 @@ using System.Windows.Forms;
 using IBMWIoTP;
 using Newtonsoft.Json.Linq;
 using System.Speech.Synthesis;
+using System.Media;
 
 namespace WindowsFormsApplication1
 {
@@ -142,38 +143,39 @@ namespace WindowsFormsApplication1
         }
         
         public static void processEvent(string deviceType, string deviceId, string eventName, string format, string data)
-        {            
-            Console.WriteLine(data);
-            //if (!eventName.Equals("image_buffer"))
-            //{
-                JObject myjson = JObject.Parse(data);
+        {   
+            //Console.WriteLine(data);
+            if (!data.Equals("D")) {
+                playSimpleSound();
+            } else { 
+            JObject myjson = JObject.Parse(data);
 
-                JToken faces = myjson["d"]["images"][0]["faces"];
-                if (faces.HasValues)
+            JToken faces = myjson["d"]["images"][0]["faces"];
+            int numfaces = faces.Count();
+            if (!faces.HasValues)
+            {
+                imagestatus = "Couldn't find anyone";
+                numfaces = 0;
+                //Console.WriteLine(imagestatus);
+            }
+                for (int i = 0; i < numfaces; i++)
                 {
-                    faces = faces[0];
-                }
+                    JToken currentface = faces[i];
 
-                if (!faces.HasValues)
-                {
-                    imagestatus = "Couldn't find anyone";
-                    //Console.WriteLine(imagestatus);
-
-                }
-                else {
-                    if (faces["identity"] == null)
+                    if (currentface["identity"] == null)
                     {
-                        imagestatus = "Found a " + faces["gender"]["gender"] + " of the age range: "  + faces["age"]["min"] + " - " + faces["age"]["max"];
+                        imagestatus = "Found a " + currentface["gender"]["gender"] + " of the age range: " + currentface["age"]["min"] + " - " + currentface["age"]["max"];
                         //Console.WriteLine(imagestatus);
                     }
                     else
                     {
-                        imagestatus = "Celebrity Found! " + (string)faces["identity"]["name"];
+                        imagestatus = "Celebrity Found! " + (string)currentface["identity"]["name"];
                         //Console.WriteLine(imagestatus);
+                        check = 1;
+                        speech(imagestatus);
                     }
                 }
-            check = 1;
-                speech(imagestatus);
+            }
         }
 
         public static void processDeviceStatus(string deviceType, string deviceId, string data)
@@ -196,12 +198,18 @@ namespace WindowsFormsApplication1
             synthesizer.Speak(str);
         }
 
+        private static void playSimpleSound()
+        {
+            SoundPlayer simpleSound = new SoundPlayer(@"c:\Windows\Media\chimes.wav");
+            simpleSound.Play();
+        }
+
         private void button8_Click(object sender, EventArgs e)
         {
             // take a picture
+            textBox1.Text = "Auto mode activated...";
             string cmdName = "Auto";
             string data = textBox2.Text;
-            textBox1.Text = "Auto mode activated...";
             sendcmd(cmdName, data);
             while (check == 0) { }
             check = 0;
