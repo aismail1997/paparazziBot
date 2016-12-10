@@ -163,7 +163,7 @@ namespace WindowsFormsApplication1
                 else {
                     if (faces["identity"] == null)
                     {
-                        imagestatus = "Found a " + faces["gender"]["gender"] + " of the age range: " + faces["age"]["max"] + "-" + faces["age"]["min"];
+                        imagestatus = "Found a " + faces["gender"]["gender"] + " of the age range: "  + faces["age"]["min"] + " - " + faces["age"]["max"];
                         //Console.WriteLine(imagestatus);
                     }
                     else
@@ -201,9 +201,16 @@ namespace WindowsFormsApplication1
             // take a picture
             string cmdName = "Auto";
             string data = textBox2.Text;
-            sendcmd(cmdName, data);
             textBox1.Text = "Auto mode activated...";
+            sendcmd(cmdName, data);
+            while (check == 0) { }
+            check = 0;
+            textBox1.Text = imagestatus;
         }
 
+        private void textBox2_TextChanged(object sender, EventArgs e)
+        {
+
+        }
     }
 }
